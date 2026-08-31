@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="washi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIKKA • Minimal Zen ToDo</title>
+    <meta name="description" content="A serene, minimal, and mindful Japanese-inspired ToDo application with Zen focus timer, daily reflections, and clean aesthetics.">
+    
+    <!-- Google Fonts: Inter, Cormorant Garamond, Zen Kaku Gothic New -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Subtle Background Texture & Ambient Ensō Circle -->
+    <div class="washi-grain" aria-hidden="true"></div>
+    <div class="ambient-enso" aria-hidden="true">
+        <svg viewBox="0 0 200 200" fill="none" stroke="currentColor">
+            <path d="M 100, 15 A 85,85 0 1,0 178, 140" stroke-width="14" stroke-linecap="round" stroke-opacity="0.035" />
+        </svg>
+    </div>
+
+    <div class="app-container">
+        <!-- App Header -->
+        <header class="app-header">
+            <div class="brand-section">
+                <div class="hanko-seal" title="Nikka • Zen Daily Routine">ZEN</div>
+                <div class="brand-text">
+                    <h1 class="brand-title">NIKKA</h1>
+                    <p class="brand-subtitle">Daily Harmony &amp; Mindful Tasks</p>
+                </div>
+            </div>
+
+            <!-- Header Controls (Focus Mode, Sound, Theme, Settings) -->
+            <div class="header-actions">
+                <button id="zenModeBtn" class="action-btn" title="Focus Timer (Pomodoro)" aria-label="Toggle Zen Focus Mode">
+                    <i data-lucide="timer"></i>
+                    <span class="btn-label">Focus</span>
+                </button>
+                <button id="soundToggleBtn" class="action-btn" title="Toggle Zen Sound FX" aria-label="Toggle Sound Effects">
+                    <i data-lucide="volume-2" id="soundIcon"></i>
+                    <span class="btn-label">Sound</span>
+                </button>
+                <button id="themeToggleBtn" class="action-btn" title="Toggle Washi (Light) / Sumi (Dark) Theme" aria-label="Toggle Theme">
+                    <i data-lucide="moon" id="themeIcon"></i>
+                    <span class="btn-label" id="themeLabel">Dark</span>
+                </button>
+                <button id="menuToggleBtn" class="action-btn menu-btn" title="Settings &amp; Statistics" aria-label="Toggle Stats and Menu">
+                    <i data-lucide="sliders-horizontal"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Grid -->
+        <main class="main-layout">
+            <!-- Left / Top Hero: Date, Daily Zen Quote, and Harmony Progress -->
+            <section class="zen-hero-card">
+                <div class="date-display">
+                    <div class="western-date-main" id="mainDateDisplay">Monday, August 31, 2026</div>
+                    <div class="western-date-sub" id="subDateDisplay">Week 36 • Mindful Living</div>
+                </div>
+
+                <!-- Daily Zen Wisdom Box -->
+                <div class="kotowaza-box">
+                    <div class="kotowaza-header">
+                        <span class="kotowaza-tag">Daily Wisdom</span>
+                        <button id="refreshQuoteBtn" class="icon-subtle-btn" title="Next reflection">
+                            <i data-lucide="refresh-cw"></i>
+                        </button>
+                    </div>
+                    <p class="kotowaza-kanji" id="quoteTitle">"A journey of a thousand miles begins with a single step."</p>
+                    <p class="kotowaza-meaning" id="quoteAuthor">— Lao Tzu • Ancient Proverb</p>
+                </div>
+
+                <!-- Zen Progress Harmony Meter -->
+                <div class="zen-progress-section">
+                    <div class="progress-info">
+                        <span class="progress-title">Daily Progress</span>
+                        <span class="progress-stats" id="progressStats">0 / 0 completed</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="progressBarFill" style="width: 0%;"></div>
+                    </div>
+                    <div class="progress-message" id="progressMessage">Begin your day with a calm and clear mind.</div>
+                </div>
+            </section>
+
+            <!-- Task Management Section -->
+            <section class="task-section">
+                <!-- Add Task Bar -->
+                <div class="task-input-card">
+                    <form id="taskForm" class="task-form" autocomplete="off">
+                        <div class="input-primary-row">
+                            <div class="input-symbol" aria-hidden="true">
+                                <i data-lucide="feather"></i>
+                            </div>
+                            <input 
+                                type="text" 
+                                id="taskTitleInput" 
+                                class="task-input" 
+                                placeholder="What would you like to accomplish today?" 
+                                maxlength="140"
+                                required
+                            >
+                            <button type="submit" class="submit-task-btn" id="addTaskBtn">
+                                <span>Add Task</span>
+                                <i data-lucide="plus"></i>
+                            </button>
+                        </div>
+
+                        <!-- Secondary Task Meta Inputs (Category, Priority, Due Date) -->
+                        <div class="input-options-row">
+                            <!-- Category Selector -->
+                            <div class="option-group">
+                                <label for="categorySelect" class="option-label">Category</label>
+                                <select id="categorySelect" class="custom-select">
+                                    <option value="work">💼 Work</option>
+                                    <option value="personal" selected>🎋 Personal</option>
+                                    <option value="study">📖 Study</option>
+                                    <option value="health">🍵 Health</option>
+                                    <option value="creative">🎨 Creative</option>
+                                </select>
+                            </div>
+
+                            <!-- Priority Selector -->
+                            <div class="option-group">
+                                <label for="prioritySelect" class="option-label">Priority</label>
+                                <select id="prioritySelect" class="custom-select">
+                                    <option value="low">Calm (Low)</option>
+                                    <option value="medium" selected>Normal (Medium)</option>
+                                    <option value="high">Urgent (High)</option>
+                                </select>
+                            </div>
+
+                            <!-- Due Date Picker -->
+                            <div class="option-group">
+                                <label for="dueDateInput" class="option-label">Due Date</label>
+                                <input type="date" id="dueDateInput" class="custom-date-input">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Filter, Search & View Controls -->
+                <div class="filter-controls-bar">
+                    <!-- Status Filter Tabs -->
+                    <div class="status-tabs" role="tablist">
+                        <button class="tab-btn active" data-filter="all" role="tab" aria-selected="true">
+                            All <span class="badge" id="countAll">0</span>
+                        </button>
+                        <button class="tab-btn" data-filter="active" role="tab" aria-selected="false">
+                            Active <span class="badge" id="countActive">0</span>
+                        </button>
+                        <button class="tab-btn" data-filter="completed" role="tab" aria-selected="false">
+                            Completed <span class="badge" id="countCompleted">0</span>
+                        </button>
+                    </div>
+
+                    <!-- Search and Sort Tools -->
+                    <div class="filter-actions">
+                        <div class="search-box">
+                            <i data-lucide="search" class="search-icon"></i>
+                            <input type="text" id="searchInput" placeholder="Search tasks..." aria-label="Search tasks">
+                            <button id="clearSearchBtn" class="clear-search-btn" title="Clear search" style="display: none;">
+                                <i data-lucide="x"></i>
+                            </button>
+                        </div>
+
+                        <!-- Category Filter Dropdown -->
+                        <select id="filterCategory" class="filter-dropdown" title="Filter by Category">
+                            <option value="all">All Categories</option>
+                            <option value="work">Work</option>
+                            <option value="personal">Personal</option>
+                            <option value="study">Study</option>
+                            <option value="health">Health</option>
+                            <option value="creative">Creative</option>
+                        </select>
+
+                        <!-- Sort Order -->
+                        <select id="sortBy" class="filter-dropdown" title="Sort Order">
+                            <option value="created-desc">Newest First</option>
+                            <option value="created-asc">Oldest First</option>
+                            <option value="priority-desc">Priority (High to Low)</option>
+                            <option value="due-asc">Due Date (Earliest)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Task List Container -->
+                <div class="tasks-wrapper">
+                    <ul id="taskList" class="task-list" aria-label="Tasks List">
+                        <!-- Tasks dynamically inserted via JS -->
+                    </ul>
+
+                    <!-- Empty State Placeholder -->
+                    <div id="emptyState" class="empty-state">
+                        <div class="empty-zen-circle">
+                            <i data-lucide="sparkles"></i>
+                        </div>
+                        <h3 class="empty-title">Clear &amp; Peaceful</h3>
+                        <p class="empty-desc">No tasks to display. Enjoy the serene moment or add a new task above.</p>
+                    </div>
+                </div>
+
+                <!-- Footer Summary & Batch Actions -->
+                <div class="task-footer">
+                    <span id="remainingSummary" class="remaining-text">0 items remaining</span>
+                    <div class="footer-actions">
+                        <button id="clearCompletedBtn" class="subtle-link-btn" title="Remove completed tasks">
+                            <i data-lucide="check-check"></i>
+                            <span>Clear Completed</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Zen Focus Mode (Pomodoro) Modal -->
+    <div id="zenModal" class="modal-backdrop" aria-hidden="true">
+        <div class="zen-modal-card">
+            <button id="closeZenModalBtn" class="modal-close-btn" aria-label="Close Focus Mode">
+                <i data-lucide="x"></i>
+            </button>
+            <div class="zen-modal-header">
+                <span class="zen-badge">Single-Task Focus</span>
+                <h2 class="zen-task-title" id="zenCurrentTaskTitle">Focus on what matters</h2>
+                <p class="zen-task-subtitle">"Single-tasking with calm and mindful attention"</p>
+            </div>
+
+            <!-- Circular Minimalist Timer -->
+            <div class="timer-container">
+                <svg class="timer-svg" viewBox="0 0 200 200">
+                    <circle class="timer-bg-circle" cx="100" cy="100" r="90"></circle>
+                    <circle class="timer-progress-circle" id="timerProgressCircle" cx="100" cy="100" r="90"></circle>
+                </svg>
+                <div class="timer-time-display" id="zenTimerDisplay">25:00</div>
+            </div>
+
+            <div class="zen-timer-controls">
+                <button id="timerToggleBtn" class="zen-primary-btn">
+                    <i data-lucide="play" id="timerPlayIcon"></i>
+                    <span id="timerPlayLabel">Start</span>
+                </button>
+                <button id="timerResetBtn" class="zen-secondary-btn">
+                    <i data-lucide="rotate-ccw"></i>
+                    <span>Reset</span>
+                </button>
+            </div>
+
+            <div class="zen-presets">
+                <button class="preset-btn active" data-minutes="25">25m (Focus)</button>
+                <button class="preset-btn" data-minutes="5">5m (Short Break)</button>
+                <button class="preset-btn" data-minutes="15">15m (Long Break)</button>
+                <button class="preset-btn" data-minutes="50">50m (Deep Work)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide-over Drawer for Stats, Export & Import -->
+    <aside id="sideDrawer" class="side-drawer" aria-hidden="true">
+        <div class="drawer-overlay" id="drawerOverlay"></div>
+        <div class="drawer-panel">
+            <div class="drawer-header">
+                <div class="hanko-seal mini">ZEN</div>
+                <h3>Settings &amp; Statistics</h3>
+                <button id="closeDrawerBtn" class="icon-subtle-btn">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <div class="drawer-body">
+                <!-- Statistics Card -->
+                <div class="drawer-section">
+                    <h4 class="drawer-section-title">📊 Progress Summary</h4>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-num" id="statTotalCreated">0</span>
+                            <span class="stat-label">Total Tasks</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-num" id="statCompleted">0</span>
+                            <span class="stat-label">Completed</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-num" id="statCompletionRate">0%</span>
+                            <span class="stat-label">Completion</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Zen Sound FX -->
+                <div class="drawer-section">
+                    <h4 class="drawer-section-title">🎵 Zen Sound Effects</h4>
+                    <p class="drawer-desc">Synthesized acoustic audio powered by the Web Audio API</p>
+                    <div class="sound-test-buttons">
+                        <button id="testWoodBtn" class="sound-chip-btn">🥢 Wood Clack</button>
+                        <button id="testBellBtn" class="sound-chip-btn">🔔 Singing Bowl</button>
+                    </div>
+                </div>
+
+                <!-- Backup and Restore -->
+                <div class="drawer-section">
+                    <h4 class="drawer-section-title">💾 Backup &amp; Portability</h4>
+                    <div class="backup-actions">
+                        <button id="exportDataBtn" class="drawer-action-btn">
+                            <i data-lucide="download"></i>
+                            <span>Export Backup (JSON)</span>
+                        </button>
+                        <label for="importFileInput" class="drawer-action-btn file-label">
+                            <i data-lucide="upload"></i>
+                            <span>Restore Backup (JSON)</span>
+                            <input type="file" id="importFileInput" accept=".json" style="display: none;">
+                        </label>
+                        <button id="loadSampleDataBtn" class="drawer-action-btn secondary">
+                            <i data-lucide="sparkles"></i>
+                            <span>Load Sample Tasks</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Philosophy Note -->
+                <div class="drawer-section wabi-sabi-note">
+                    <h5>Wabi-Sabi &amp; Simplicity</h5>
+                    <p>Finding beauty in simplicity and intentional living. Remove the unnecessary so that the necessary may speak.</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Toast Notification -->
+    <div id="toastNotification" class="toast" role="status" aria-live="polite"></div>
+
+    <!-- Application Script -->
+    <script src="app.js"></script>
+</body>
+</html>

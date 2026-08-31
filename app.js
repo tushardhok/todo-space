@@ -715,6 +715,11 @@
         document.documentElement.setAttribute('data-theme', theme);
         localStorage.setItem(STORAGE_KEY_THEME, theme);
 
+        const themeColorMeta = document.getElementById('themeColorMeta');
+        if (themeColorMeta) {
+            themeColorMeta.setAttribute('content', theme === 'sumi' ? '#141517' : '#F8F6F1');
+        }
+
         if (theme === 'sumi') {
             DOM.themeIcon.setAttribute('data-lucide', 'sun');
             DOM.themeLabel.textContent = 'Light';
